@@ -1,0 +1,17 @@
+.page-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.page-layout__main {
+  flex: 1;
+  padding: var(--spacing-xl) 0;
+}
+
+.page-layout__title {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-lg);
+  color: var(--color-text);
+}

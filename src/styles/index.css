@@ -1,0 +1,394 @@
+:root {
+  --color-primary: #1CBC66;
+  --color-secondary: #8b5cf6;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-background: #ffffff;
+  --color-surface: #f8fafc;
+  --color-text: #1e293b;
+  --color-text-secondary: #64748b;
+  --color-border: #e2e8f0;
+  --color-brand-green: #1CBC66;
+  --color-brand-blue: #1e3a8a;
+  --color-brand-green-light: #d1fae5;
+  --color-navbar-background: #eaf8f0;
+  --white: #fff;
+  
+  --transition: all .25s ease;
+  --font-family--base: "SansaPro",sans-serif;
+  --font-weight--base: 400;
+  --line-height--base: 1.5;
+  --text-size--base: 103.5%;
+  --primary-color: #003147;
+  --tertiary-color: #257aa7;
+  --text-color: #003147;
+  --border-radius: 5px;
+  
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  
+  --border-radius-sm: 0.25rem;
+  --border-radius-md: 0.5rem;
+  --border-radius-lg: 0.75rem;
+  --border-radius-xl: 1rem;
+  
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  
+  --font-family: "SansaPro", sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+}
+
+
+
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-2 {
+  gap: var(--spacing-md);
+}
+
+.gap-4 {
+  gap: var(--spacing-xl);
+}
+
+/* ==========================================================================
+   Variant C: Split Action Buttons (Upload Invoice & Take Photo)
+   ========================================================================== */
+
+.hero-variant-c__container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.hero-variant-c__title {
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 500;
+  margin: 0 0 16px 0;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+}
+
+.hero-variant-c__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  width: 100%;
+}
+
+@media (max-width: 680px) {
+  .hero-variant-c__actions {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.variant-c-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: inherit;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Variant C - Upload Invoice Button: Green accent style */
+.variant-c-btn--upload {
+  background-color: rgba(28, 188, 102, 0.12);
+  border: 1.5px solid #1cbc66;
+  color: #ffffff;
+}
+
+.variant-c-btn--upload .variant-c-btn__icon {
+  color: #1cbc66;
+  background: rgba(28, 188, 102, 0.15);
+  border-radius: 6px;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.variant-c-btn--upload:hover {
+  background-color: rgba(28, 188, 102, 0.22);
+  border-color: #24d677;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(28, 188, 102, 0.25);
+}
+
+/* Variant C - Take Photo Button: Blue accent style */
+.variant-c-btn--camera {
+  background-color: rgba(35, 103, 145, 0.18);
+  border: 1.5px solid #287da8;
+  color: #ffffff;
+}
+
+.variant-c-btn--camera .variant-c-btn__icon {
+  color: #55b4e6;
+  background: rgba(40, 125, 168, 0.2);
+  border-radius: 6px;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.variant-c-btn--camera:hover {
+  background-color: rgba(35, 103, 145, 0.32);
+  border-color: #3aa3d8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(37, 122, 167, 0.3);
+}
+
+.variant-c-btn__content {
+  display: flex;
+  flex-direction: column;
+}
+
+.variant-c-btn__label {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.25;
+}
+
+.variant-c-btn__sublabel {
+  font-size: 0.8125rem;
+  color: #a4c4d5;
+  margin-top: 3px;
+  font-weight: 400;
+}
+
+.hero-variant-c__format-note {
+  font-size: 0.78rem;
+  color: #7d9eaf;
+  margin-top: 12px;
+  letter-spacing: 0.02em;
+}
+
+/* Selected File Pill */
+.variant-c-selected-file {
+  margin-top: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 6px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #ffffff;
+  animation: fadeIn 0.2s ease-in;
+}
+
+.variant-c-file-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.875rem;
+}
+
+.variant-c-file-icon {
+  color: #1cbc66;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.variant-c-remove-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+
+.variant-c-remove-btn:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+/* Camera Modal */
+.camera-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 20, 30, 0.82);
+  backdrop-filter: blur(4px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.camera-modal {
+  background: #003147;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 520px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  color: #ffffff;
+}
+
+.camera-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.camera-modal-header h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.camera-modal-close {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.camera-preview-wrapper {
+  position: relative;
+  width: 100%;
+  height: 340px;
+  background: #07151e;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.camera-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.camera-target-guide {
+  position: absolute;
+  top: 30px;
+  left: 30px;
+  right: 30px;
+  bottom: 30px;
+  border: 2px dashed rgba(28, 188, 102, 0.6);
+  border-radius: 8px;
+  pointer-events: none;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 15px;
+}
+
+.camera-guide-text {
+  font-size: 0.8rem;
+  background: rgba(0, 0, 0, 0.65);
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+
+.camera-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 14px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.camera-cancel-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  border-radius: 5px;
+  padding: 9px 18px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.camera-cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.camera-snap-btn {
+  background: #1cbc66;
+  border: none;
+  color: #ffffff;
+  border-radius: 5px;
+  padding: 9px 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.15s;
+}
+
+.camera-snap-btn:hover {
+  background: #169b54;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
