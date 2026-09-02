@@ -1,67 +1,139 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { useTheme } from '@/context/ThemeContext'
-import './Header.css'
+import { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
 
 export function Header() {
-  const { theme, toggleTheme } = useTheme()
-  const [currentLang, setCurrentLang] = useState('EN')
-  const languages = ['NL', 'EN', 'FR']
+  const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { isAuthenticated, logout } = useAuth();
+  const location = useLocation();
 
-  const navLinks = [
-    { label: 'For whom?', path: '/for-whom' },
-    { label: 'FAQ', path: '/faq' },
-    { label: 'Knowledge center', path: '/knowledge' },
-    { label: 'Contact', path: '/contact' },
-  ]
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+  const isLoginPage = location.pathname.includes('/login');
 
   return (
-    <header className="header">
-      <div className="container header__content">
-        <div className="header__logo">
-          <Link to="/">
-            <img src="/assets/logo.svg" alt="Unpaid" className="header__logo-image" />
-          </Link>
-        </div>
-        
-        <nav className="header__nav">
-          <ul className="header__nav-links">
-            {navLinks.map((link) => (
-              <li key={link.path}>
-                <Link to={link.path} className="header__nav-link">
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-          
-          <div className="header__actions">
-            <button className="header__claims-btn">Your claims</button>
-            <button className="header__login-btn">Log in</button>
-            <button className="header__signup-btn">Sign up</button>
-            
-            <div className="header__lang-selector">
-              {languages.map((lang) => (
-                <button
-                  key={lang}
-                  className={`header__lang-btn ${currentLang === lang ? 'header__lang-btn--active' : ''}`}
-                  onClick={() => setCurrentLang(lang)}
-                >
-                  {lang}
-                </button>
-              ))}
-            </div>
-            
-            <button 
-              className="header__theme-toggle"
-              onClick={toggleTheme}
-              aria-label="Toggle theme"
-            >
-              {theme === 'light' ? '🌙' : '☀️'}
-            </button>
+    <header className="main-header header--auth" role="banner">
+      <div className="container">
+        <div id="block-epsenkaas-theme-branding" className="block block-system block-system-branding-block">
+          <div className="logo-wrapper">
+            <Link className="site-logo" to="/en" title="Home" rel="home">
+              <img src="/assets/logo.svg" alt="Home" />
+            </Link>
           </div>
-        </nav>
+        </div>
+
+        <div id="block-headermenu" className="block block-project block-ek-menu-block">
+          <div
+            className={`nav-toggle--menu ${menuOpen ? 'open' : ''}`}
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            Menu
+          </div>
+          <button
+            aria-label="Menu"
+            className={`nav-toggle ${menuOpen ? 'open' : ''}`}
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            Menu
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+
+          <div className={`menu-wrapper ${menuOpen ? 'open' : ''}`}>
+            <nav className="main-menu">
+              <ul className="menu">
+                <li className="menu-item">
+                  <a href="/en/whom">For whom?</a>
+                </li>
+                <li className="menu-item">
+                  <a href="/en/faq">FAQ</a>
+                </li>
+                <li className="menu-item">
+                  <a href="/en/discover">Knowledge center</a>
+                </li>
+                <li className="menu-item">
+                  <a href="/en/contact">Contact</a>
+                </li>
+              </ul>
+            </nav>
+
+            <nav className="account-menu">
+              <ul className="menu">
+                <li className="menu-item">
+                  {isAuthenticated ? (
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      <Link
+                        to="/claims"
+                        className="account-menu__claims-btn"
+                        style={{
+                          backgroundColor: '#ffffff',
+                          color: '#003147',
+                          fontWeight: 600,
+                          padding: '8px 16px',
+                          borderRadius: '6px',
+                          display: 'inline-block',
+                          textDecoration: 'none',
+                          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
+                          fontSize: '0.92rem',
+                        }}
+                      >
+                        Your claims
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="account-menu__logout-btn"
+                        style={{
+                          backgroundColor: '#ffffff',
+                          color: '#003147',
+                          fontWeight: 600,
+                          padding: '8px 16px',
+                          borderRadius: '6px',
+                          border: 'none',
+                          cursor: 'pointer',
+                          display: 'inline-block',
+                          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
+                          fontSize: '0.92rem',
+                        }}
+                      >
+                        Log out
+                      </button>
+                    </div>
+                  ) : (
+                    <Link
+                      to="/en/user/login"
+                      className={isLoginPage ? 'is-active' : ''}
+                      aria-current={isLoginPage ? 'page' : undefined}
+                    >
+                      Log in
+                    </Link>
+                  )}
+                </li>
+              </ul>
+            </nav>
+
+            <ul className="language-switcher">
+              <li>
+                <a href="/nl/startpagina" hrefLang="nl">
+                  NL
+                </a>
+              </li>
+              <li className="active">EN</li>
+              <li>
+                <a href="/fr/page-daccueil" hrefLang="fr">
+                  FR
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
     </header>
-  )
+  );
 }

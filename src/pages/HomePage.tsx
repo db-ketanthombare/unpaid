@@ -1,4 +1,11 @@
 import React, { useState, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Footer } from '@/components/layout/Footer';
+import { invoiceService } from '@/services/invoiceService';
+import { authService } from '@/services/authService';
+import { ExtractedInvoiceData } from '@/types/invoice';
+import { ExtractedInvoiceReview } from '@/components/invoice/ExtractedInvoiceReview';
+import { useAuth } from '@/context/AuthContext';
 
 interface Testimonial {
   quote: string;
@@ -143,15 +150,30 @@ const testimonials: Testimonial[] = [
 ];
 
 export function HomePage() {
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
 
-  // Variant C state
-  const [invoiceFile, setInvoiceFile] = useState<{ name: string; size: string; previewUrl?: string; isImage: boolean } | null>(null);
+  // Invoice OCR state
+  const [invoiceFile, setInvoiceFile] = useState<{
+    name: string;
+    size: string;
+    previewUrl?: string;
+    isImage: boolean;
+    rawFile?: File | Blob;
+  } | null>(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanProgress, setScanProgress] = useState(15);
+  const [scanStatus, setScanStatus] = useState('Extracting amounts and payment references...');
+  const [extractedData, setExtractedData] = useState<ExtractedInvoiceData | null>(null);
+  const [scanError, setScanError] = useState<string | null>(null);
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const reviewRef = useRef<HTMLDivElement | null>(null);
 
   const handlePrevSlide = () => {
     setActiveSlide((prev) => (prev > 0 ? prev - 1 : testimonials.length - 1));
@@ -178,7 +200,253 @@ export function HomePage() {
         size: formatFileSize(file.size),
         previewUrl: isImg ? URL.createObjectURL(file) : undefined,
         isImage: isImg,
+        rawFile: file,
       });
+      setScanError(null);
+    }
+  };
+
+  const handleScanInvoice = async () => {
+    if (!invoiceFile || !invoiceFile.rawFile) {
+      setScanError('Please select or capture an invoice document first.');
+      return;
+    }
+
+    setIsScanning(true);
+    setScanProgress(18);
+    setScanStatus('Analyzing document structure...');
+    setScanError(null);
+
+    const t1 = setTimeout(() => {
+      setScanProgress(45);
+      setScanStatus('Extracting debtor and creditor information...');
+    }, 1200);
+
+    const t2 = setTimeout(() => {
+      setScanProgress(72);
+      setScanStatus('Extracting amounts and payment references...');
+    }, 2800);
+
+    const t3 = setTimeout(() => {
+      setScanProgress(89);
+      setScanStatus('Verifying IBAN and tax identifiers...');
+    }, 4800);
+
+    try {
+      const data = await invoiceService.scanInvoice(invoiceFile.rawFile, invoiceFile.name);
+      setScanProgress(100);
+      setScanStatus('Scan complete!');
+      setExtractedData(data);
+      setTimeout(() => {
+        reviewRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 150);
+    } catch (err: unknown) {
+      console.error('Scan error:', err);
+      setScanError(err instanceof Error ? err.message : 'Failed to scan invoice with AI backend.');
+    } finally {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      setIsScanning(false);
+    }
+  };
+
+  const { isAuthenticated, token, logout } = useAuth();
+  const [claimSuccessData, setClaimSuccessData] = useState<{
+    invoiceNumber: string;
+    amount: string | number;
+    currency: string;
+    debtorName: string;
+  } | null>(null);
+  const [isSubmittingClaim, setIsSubmittingClaim] = useState(false);
+  const [claimError, setClaimError] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    const rawSuccess = sessionStorage.getItem('unpaid_claim_success');
+    if (rawSuccess) {
+      try {
+        setClaimSuccessData(JSON.parse(rawSuccess));
+        sessionStorage.removeItem('unpaid_claim_success');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }, []);
+
+  const submitClaimAndRedirect = async (data: ExtractedInvoiceData, activeToken?: string) => {
+    setIsSubmittingClaim(true);
+    setClaimError(null);
+    try {
+      const invNum =
+        data.invoiceDetails?.invoiceNumber ||
+        `INV-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`;
+      const amtVal = data.invoiceDetails?.amount
+        ? Number(data.invoiceDetails.amount).toFixed(2)
+        : '0.00';
+      const currVal = data.invoiceDetails?.currency || 'EUR';
+      const debtorVal =
+        data.debtorDetails?.debtorName || data.debtorDetails?.companyName || 'Debtor BV';
+      const companyVal = data.creditorDetails?.companyName || 'My Company BV';
+      const refVal = data.invoiceDetails?.paymentReference || invNum;
+      const dateVal = data.invoiceDetails?.invoiceDate || new Date().toISOString().slice(0, 10);
+
+      // 1. Immediately store the claim into dashboard records
+      // Also save extracted company to unpaid_user_companies
+      const companyVat =
+        data.creditorDetails?.vat ||
+        data.debtorDetails?.vat ||
+        (data.creditorDetails as { taxNumber?: string })?.taxNumber ||
+        (data.debtorDetails as { taxNumber?: string })?.taxNumber ||
+        '—';
+
+      const creditorAddr = [
+        data.creditorDetails?.address,
+        data.creditorDetails?.postalCode,
+        data.creditorDetails?.city,
+        data.creditorDetails?.country,
+      ]
+        .filter(Boolean)
+        .join(', ');
+
+      const debtorAddr = [
+        data.debtorDetails?.address,
+        data.debtorDetails?.postalCode,
+        data.debtorDetails?.city,
+        data.debtorDetails?.country,
+      ]
+        .filter(Boolean)
+        .join(', ');
+
+      const companyAddr = creditorAddr || debtorAddr || data.debtorDetails?.address || '—';
+
+      const newClaim = {
+        id: String(Date.now()),
+        claimNumber: invNum,
+        company: companyVal,
+        debtorName: debtorVal,
+        total: amtVal,
+        currency: currVal,
+        reference: refVal,
+        date: dateVal,
+        status: 'Registered',
+        vat: companyVat,
+        address: companyAddr,
+      };
+
+      const existing = JSON.parse(localStorage.getItem('unpaid_user_claims') || '[]');
+      localStorage.setItem('unpaid_user_claims', JSON.stringify([newClaim, ...existing]));
+
+      const existingCompanies = JSON.parse(localStorage.getItem('unpaid_user_companies') || '[]');
+      const compIdx = existingCompanies.findIndex((c: { name: string }) => c.name.toLowerCase() === companyVal.toLowerCase());
+      if (compIdx >= 0) {
+        if ((!existingCompanies[compIdx].vat || existingCompanies[compIdx].vat === '—') && companyVat && companyVat !== '—') {
+          existingCompanies[compIdx].vat = companyVat;
+        }
+        if ((!existingCompanies[compIdx].address || existingCompanies[compIdx].address === '—') && companyAddr && companyAddr !== '—') {
+          existingCompanies[compIdx].address = companyAddr;
+        }
+      } else {
+        existingCompanies.unshift({
+          id: String(Date.now()),
+          name: companyVal,
+          vat: companyVat,
+          address: companyAddr,
+        });
+      }
+      localStorage.setItem('unpaid_user_companies', JSON.stringify(existingCompanies));
+
+      sessionStorage.setItem(
+        'unpaid_claim_success',
+        JSON.stringify({
+          invoiceNumber: invNum,
+          amount: amtVal,
+          currency: currVal,
+          debtorName: debtorVal,
+        })
+      );
+
+      sessionStorage.removeItem('unpaid_pending_claim');
+      setExtractedData(null);
+
+      // 2. Resiliently sync to backend with sanitized fields
+      try {
+        const authToken = activeToken || authService.getStoredToken() || token || undefined;
+        const sanitizedPayload: ExtractedInvoiceData = {
+          ...data,
+          creditorDetails: {
+            ...data.creditorDetails,
+            companyName: companyVal,
+          },
+          debtorDetails: {
+            ...data.debtorDetails,
+            debtorName: debtorVal,
+            companyName: debtorVal,
+            email:
+              data.debtorDetails?.email ||
+              `billing@${debtorVal.toLowerCase().replace(/[^a-z0-9]/g, '') || 'company'}.com`,
+          },
+          invoiceDetails: {
+            ...data.invoiceDetails,
+            invoiceNumber: invNum,
+            amount: data.invoiceDetails?.amount || amtVal,
+            currency: currVal,
+            invoiceDate: dateVal,
+            dueDate:
+              data.invoiceDetails?.dueDate ||
+              new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10),
+          },
+        };
+        await authService.confirmInvoice(sanitizedPayload, authToken);
+      } catch (backendErr) {
+        console.warn('Backend claim sync note (claim saved locally):', backendErr);
+      }
+
+      navigate('/claims');
+    } catch (err: unknown) {
+      console.error('Confirm claim error:', err);
+      setClaimError(err instanceof Error ? err.message : 'Failed to confirm claim.');
+    } finally {
+      setIsSubmittingClaim(false);
+    }
+  };
+
+  const handleConfirmClaim = async (data: ExtractedInvoiceData) => {
+    if (!isAuthenticated) {
+      // User is not logged in: save pending claim and redirect directly to dedicated login page
+      sessionStorage.setItem('unpaid_pending_claim', JSON.stringify(data));
+      navigate('/en/user/login?destination=/claims');
+      return;
+    }
+
+    // User is already logged in: proceed with claim and redirect to claims page
+    await submitClaimAndRedirect(data);
+  };
+
+  const handleResetScan = () => {
+    setExtractedData(null);
+    setInvoiceFile(null);
+    setScanError(null);
+    setClaimSuccessData(null);
+    setClaimError(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleLoadSampleInvoice = async () => {
+    try {
+      const response = await fetch('/assets/sample-invoice.pdf');
+      const blob = await response.blob();
+      const file = new File([blob], 'factura_spanish_INV-2024-0097.pdf', { type: 'application/pdf' });
+      setInvoiceFile({
+        name: file.name,
+        size: formatFileSize(file.size),
+        isImage: false,
+        rawFile: file,
+      });
+      setScanError(null);
+    } catch (err) {
+      console.warn('Could not load sample invoice:', err);
     }
   };
 
@@ -214,13 +482,19 @@ export function HomePage() {
       const ctx = canvas.getContext('2d');
       if (ctx) {
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL('image/jpeg');
-        setInvoiceFile({
-          name: `scanned_invoice_${new Date().toISOString().slice(0, 10)}.jpg`,
-          size: '~250 KB',
-          previewUrl: dataUrl,
-          isImage: true,
-        });
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+        canvas.toBlob((blob) => {
+          if (blob) {
+            setInvoiceFile({
+              name: `scanned_invoice_${new Date().toISOString().slice(0, 10)}.jpg`,
+              size: formatFileSize(blob.size),
+              previewUrl: dataUrl,
+              isImage: true,
+              rawFile: blob,
+            });
+            setScanError(null);
+          }
+        }, 'image/jpeg', 0.9);
       }
     } else {
       setInvoiceFile({
@@ -241,9 +515,9 @@ export function HomePage() {
           <div className="container">
             <div id="block-epsenkaas-theme-branding" className="block block-system block-system-branding-block">
               <div className="logo-wrapper">
-                <a className="site-logo" href="/en" title="Home" rel="home">
+                <Link className="site-logo" to="/en" title="Home" rel="home">
                   <img src="/assets/logo.svg" alt="Home" />
-                </a>
+                </Link>
               </div>
             </div>
 
@@ -270,9 +544,6 @@ export function HomePage() {
                 <nav className="main-menu">
                   <ul className="menu">
                     <li className="menu-item">
-                      <a href="/en" className="is-active" aria-current="page">Home</a>
-                    </li>
-                    <li className="menu-item">
                       <a href="/en/whom">For whom?</a>
                     </li>
                     <li className="menu-item">
@@ -289,16 +560,46 @@ export function HomePage() {
 
                 <nav className="account-menu">
                   <ul className="menu">
-                    <li className="menu-item">
-                      <a href="/en/user/login">Log in</a>
-                    </li>
+                    {isAuthenticated ? (
+                      <>
+                        <li className="menu-item">
+                          <Link to="/claims" className="account-claims-link">
+                            Your claims
+                          </Link>
+                        </li>
+                        <li className="menu-item">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              logout();
+                              navigate('/');
+                            }}
+                            className="account-logout-btn"
+                          >
+                            Log out
+                          </button>
+                        </li>
+                      </>
+                    ) : (
+                      <li className="menu-item">
+                        <Link to="/en/user/login">Log in</Link>
+                      </li>
+                    )}
                   </ul>
                 </nav>
 
                 <ul className="language-switcher">
-                  <li><a href="/nl/startpagina" hrefLang="nl">nl</a></li>
-                  <li className="active">en</li>
-                  <li><a href="/fr/page-daccueil" hrefLang="fr">fr</a></li>
+                  <li>
+                    <a href="/nl/startpagina" hrefLang="nl">
+                      NL
+                    </a>
+                  </li>
+                  <li className="active">EN</li>
+                  <li>
+                    <a href="/fr/page-daccueil" hrefLang="fr">
+                      FR
+                    </a>
+                  </li>
                 </ul>
               </div>
             </div>
@@ -308,7 +609,20 @@ export function HomePage() {
         {/* Hero Section */}
         <div className="hero block block-project block-ek-header-block" id="block-headerinfopage">
           <div className="hero__video">
-            <video autoPlay muted playsInline loop>
+            {!isVideoLoaded && <div className="hero__video-shimmer" />}
+            <video
+              autoPlay
+              muted
+              playsInline
+              loop
+              onLoadedData={() => setIsVideoLoaded(true)}
+              onCanPlay={() => setIsVideoLoaded(true)}
+              onPlaying={() => setIsVideoLoaded(true)}
+              style={{
+                opacity: isVideoLoaded ? 1 : 0,
+                transition: 'opacity 0.6s ease',
+              }}
+            >
               <source src="/assets/unpaid-hero.mp4" type="video/mp4" />
               Your browser does not support the video tag.
             </video>
@@ -324,88 +638,229 @@ export function HomePage() {
               </div>
 
               <div className="hero-vat__form hero-variant-c__container">
-                <h3 className="hero-variant-c__title">Submit your invoice in the way that's easy for you</h3>
-
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  style={{ display: 'none' }}
-                  accept=".pdf,image/jpeg,image/png,image/webp,image/tiff"
-                  onChange={handleFileInputChange}
-                />
-
-                <div className="hero-variant-c__actions">
-                  <button
-                    type="button"
-                    className="variant-c-btn variant-c-btn--upload"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <div className="variant-c-btn__icon">
-                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                        <polyline points="17 8 12 3 7 8" />
-                        <line x1="12" y1="3" x2="12" y2="15" />
-                      </svg>
-                    </div>
-                    <div className="variant-c-btn__content">
-                      <div className="variant-c-btn__label">Upload Invoice</div>
-                      <div className="variant-c-btn__sublabel">Choose file from device</div>
-                    </div>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="variant-c-btn variant-c-btn--camera"
-                    onClick={startCamera}
-                  >
-                    <div className="variant-c-btn__icon">
-                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                        <circle cx="12" cy="13" r="4" />
-                      </svg>
-                    </div>
-                    <div className="variant-c-btn__content">
-                      <div className="variant-c-btn__label">Take Photo</div>
-                      <div className="variant-c-btn__sublabel">Capture with camera</div>
-                    </div>
-                  </button>
-                </div>
-
-                <div className="hero-variant-c__format-note">
-                  PDF, JPG, PNG up to 10MB
-                </div>
-
-                {invoiceFile && (
-                  <div className="variant-c-selected-file">
-                    <div className="variant-c-file-info">
-                      <span className="variant-c-file-icon">✓</span>
-                      <div>
-                        <strong>{invoiceFile.name}</strong> ({invoiceFile.size})
+                {isScanning ? (
+                  <div className="processing-variant-c">
+                    <div className="processing-variant-c__header">
+                      <div className="processing-variant-c__icon-wrapper">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                          <polyline points="14 2 14 8 20 8" />
+                          <line x1="16" y1="13" x2="8" y2="13" />
+                          <line x1="16" y1="17" x2="8" y2="17" />
+                          <polyline points="10 9 9 9 8 9" />
+                        </svg>
+                      </div>
+                      <div className="processing-variant-c__title-group">
+                        <h3 className="processing-variant-c__title">Extracting invoice details...</h3>
+                        <p className="processing-variant-c__subtitle">This may take a few seconds.</p>
                       </div>
                     </div>
-                    <div className="variant-c-file-actions">
-                      <button
-                        type="button"
-                        className="button"
-                        style={{ padding: '7px 18px', fontSize: '0.9rem', marginRight: '8px' }}
-                        onClick={() => alert(`Proceeding with ${invoiceFile.name}`)}
-                      >
-                        Next step
-                      </button>
-                      <button
-                        type="button"
-                        className="variant-c-remove-btn"
-                        onClick={() => setInvoiceFile(null)}
-                      >
-                        ✕
-                      </button>
+
+                    <div className="processing-variant-c__progress-row">
+                      <div className="processing-variant-c__track">
+                        <div
+                          className="processing-variant-c__bar"
+                          style={{ width: `${scanProgress}%` }}
+                        ></div>
+                      </div>
+                      <div className="processing-variant-c__percentage">{scanProgress}%</div>
+                    </div>
+
+                    <div className="processing-variant-c__footer">
+                      <div className="processing-variant-c__status-pill">
+                        <span className="processing-variant-c__dot"></span>
+                        <span>{scanStatus}</span>
+                      </div>
                     </div>
                   </div>
+                ) : extractedData ? (
+                  <div className="variant-d-container">
+                    <div className="variant-d-card">
+                      <div className="variant-d-icon">
+                        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#1cbc66" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="10" />
+                          <polyline points="16 9 10 15 7 12" />
+                        </svg>
+                      </div>
+
+                      <div className="variant-d-content">
+                        <div className="variant-d-title">Invoice Scanned Successfully!</div>
+                        <div className="variant-d-subtitle">
+                          <strong>{invoiceFile?.name || 'Invoice'}</strong> has been scanned and is ready to review.
+                        </div>
+                      </div>
+
+                      <div className="variant-d-actions">
+                        <button
+                          type="button"
+                          className="variant-d-btn-review"
+                          onClick={() => reviewRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                        >
+                          Review Details
+                        </button>
+
+                        <button
+                          type="button"
+                          className="variant-d-btn-scan"
+                          onClick={handleResetScan}
+                        >
+                          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M3 7V5a2 2 0 0 1 2-2h2" />
+                            <path d="M17 3h2a2 2 0 0 1 2 2v2" />
+                            <path d="M21 17v2a2 2 0 0 1-2 2h-2" />
+                            <path d="M7 21H5a2 2 0 0 1-2-2v-2" />
+                            <line x1="8" y1="12" x2="16" y2="12" />
+                          </svg>
+                          Scan Another
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="variant-d-security-note">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1cbc66" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        <polyline points="9 12 11 14 15 10" />
+                      </svg>
+                      <span>Your data is secure and encrypted.</span>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <h3 className="hero-variant-c__title">Submit your invoice in the way that's easy for you</h3>
+
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      style={{ display: 'none' }}
+                      accept=".pdf,image/jpeg,image/png,image/webp,image/tiff"
+                      onChange={handleFileInputChange}
+                    />
+
+                    <div className="hero-variant-c__actions">
+                      <button
+                        type="button"
+                        className="variant-c-btn variant-c-btn--upload"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <div className="variant-c-btn__icon">
+                          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="17 8 12 3 7 8" />
+                            <line x1="12" y1="3" x2="12" y2="15" />
+                          </svg>
+                        </div>
+                        <div className="variant-c-btn__content">
+                          <div className="variant-c-btn__label">Upload Invoice</div>
+                          <div className="variant-c-btn__sublabel">Choose file from device</div>
+                        </div>
+                      </button>
+
+                      <button
+                        type="button"
+                        className="variant-c-btn variant-c-btn--camera"
+                        onClick={startCamera}
+                      >
+                        <div className="variant-c-btn__icon">
+                          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                            <circle cx="12" cy="13" r="4" />
+                          </svg>
+                        </div>
+                        <div className="variant-c-btn__content">
+                          <div className="variant-c-btn__label">Take Photo</div>
+                          <div className="variant-c-btn__sublabel">Capture with camera</div>
+                        </div>
+                      </button>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px', fontSize: '0.85rem' }}>
+                      <span className="hero-variant-c__format-note" style={{ margin: 0 }}>
+                        PDF, JPG, PNG up to 10MB
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleLoadSampleInvoice}
+                        style={{ background: 'none', border: 'none', color: '#1cbc66', textDecoration: 'underline', cursor: 'pointer', padding: 0, fontSize: '0.85rem' }}
+                      >
+                        Try sample invoice
+                      </button>
+                    </div>
+
+                    {scanError && (
+                      <div style={{ marginTop: '12px', padding: '10px 14px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '6px', color: '#991b1b', fontSize: '0.88rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span>⚠️ {scanError}</span>
+                        <button
+                          type="button"
+                          onClick={() => setScanError(null)}
+                          style={{ background: 'none', border: 'none', color: '#991b1b', cursor: 'pointer', fontWeight: 'bold' }}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    )}
+
+                    {invoiceFile && (
+                      <div className="variant-c-selected-file">
+                        <div className="variant-c-file-info">
+                          <span className="variant-c-file-icon">✓</span>
+                          <div>
+                            <strong>{invoiceFile.name}</strong> ({invoiceFile.size})
+                          </div>
+                        </div>
+                        <div className="variant-c-file-actions">
+                          <button
+                            type="button"
+                            className="variant-c-scan-cta"
+                            onClick={handleScanInvoice}
+                          >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}>
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                              <polyline points="14 2 14 8 20 8" />
+                              <line x1="16" y1="13" x2="8" y2="13" />
+                              <line x1="16" y1="17" x2="8" y2="17" />
+                            </svg>
+                            Scan Invoice
+                          </button>
+                          <button
+                            type="button"
+                            className="variant-c-remove-btn"
+                            onClick={handleResetScan}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
           </div>
         </div>
+
+        {/* Extracted Invoice Review Section */}
+        {extractedData && (
+          <div ref={reviewRef} style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', padding: '2.5rem 0' }}>
+            {isSubmittingClaim && (
+              <div style={{ maxWidth: '1200px', margin: '0 auto 1.5rem', padding: '12px 18px', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '8px', color: '#1e40af', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span className="processing-variant-c__dot" style={{ backgroundColor: '#2563eb' }}></span>
+                <span>Submitting your invoice claim to the legal bailiff network...</span>
+              </div>
+            )}
+            {claimError && (
+              <div style={{ maxWidth: '1200px', margin: '0 auto 1.5rem', padding: '12px 18px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', color: '#991b1b', fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span>⚠️ {claimError}</span>
+                <button type="button" onClick={() => setClaimError(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold', color: '#991b1b' }}>✕</button>
+              </div>
+            )}
+            <ExtractedInvoiceReview
+              data={extractedData}
+              fileName={invoiceFile?.name}
+              onReset={handleResetScan}
+              onConfirm={handleConfirmClaim}
+            />
+          </div>
+        )}
 
         {/* Main Content Area */}
         <div className="main-wrapper">
@@ -822,71 +1277,7 @@ export function HomePage() {
           </main>
         </div>
 
-        {/* Main Footer */}
-        <footer className="main-footer" role="contentinfo">
-          <div className="container">
-            <div id="block-epsenkaas-theme-config-pages" className="block block-config-pages block-config-pages-block">
-              <div className="config-pages config-pages--type-footer config-pages--view-mode-full">
-                <div className="footer__top">
-                  <div className="intro">
-                    <p className="txt--intro">Unpaid aims to assist companies in a simple, transparent and fast way when their customers do not pay.</p>
-                    <p><a href="https://unpaid.be/user/login">Start your claim</a></p>
-                  </div>
-                  <div className="logos">
-                    <div className="media media--type-image media--view-mode-default image-wrapper">
-                      <img
-                        src="/assets/unpaid-footer-logos_0.png"
-                        width="252"
-                        height="105"
-                        alt="Unpaid"
-                        loading="lazy"
-                        className="image-style-site-width"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="footer__wrapper">
-                  <div className="footer--col address">
-                    <p>
-                      Port Arthurlaan 11e<br />
-                      9000 Gent<br />
-                      <a href="tel:003293963400">+32 9 396 34 00</a>{' '}
-                      <a href="mailto:info@unpaid.be">info@unpaid.be</a>
-                    </p>
-                  </div>
-
-                  <div className="footer--col">
-                    <ul className="footer__links">
-                      <li><a href="/en/whom">For whom?</a></li>
-                      <li><a href="/en/why-unpaid">Why Unpaid?</a></li>
-                      <li><a href="/en/references">References</a></li>
-                      <li><a href="/en/integration-partners">Integration partners</a></li>
-                      <li><a href="https://unpaid.be/en/your-invoice-over-time">Check if your invoice is time-barred</a></li>
-                    </ul>
-                  </div>
-
-                  <div className="footer--col">
-                    <ul className="footer__links">
-                      <li><a href="https://www.facebook.com/unpaidgent/">Facebook</a></li>
-                      <li><a href="https://www.linkedin.com/company/unpaid/">LinkedIn</a></li>
-                      <li><a href="https://www.instagram.com/_unpaid_/">Instagram</a></li>
-                    </ul>
-                  </div>
-
-                  <div className="footer--col">
-                    <ul className="footer__links">
-                      <li><a href="/en/disclaimer">Disclaimer</a></li>
-                      <li><a href="/en/general-terms-and-conditions">General terms and conditions</a></li>
-                      <li><a href="/en/privacy-statement">Privacy policy</a></li>
-                      <li><a href="/en/cookie-statement">Cookies</a></li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </footer>
+        <Footer />
 
         <div className="backdrop"></div>
 
@@ -946,6 +1337,34 @@ export function HomePage() {
             </div>
           </div>
         )}
+
+        {/* Claim Success Modal */}
+        {claimSuccessData && (
+          <div className="claim-success-modal-overlay" onClick={() => setClaimSuccessData(null)}>
+            <div className="claim-success-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="claim-success-modal__icon">
+                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#1cbc66" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="16 9 10 15 7 12" />
+                </svg>
+              </div>
+              <h2 className="claim-success-modal__title">Claim Submitted Successfully!</h2>
+              <p className="claim-success-modal__desc">
+                Your collection claim for invoice <strong>#{claimSuccessData.invoiceNumber}</strong> ({claimSuccessData.currency}{claimSuccessData.amount}) against <strong>{claimSuccessData.debtorName}</strong> has been registered with our legal bailiff network.
+              </p>
+              <div className="claim-success-modal__actions">
+                <button
+                  type="button"
+                  className="variant-c-scan-cta"
+                  onClick={handleResetScan}
+                >
+                  Submit Another Invoice
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );

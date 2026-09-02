@@ -1,0 +1,305 @@
+/* ==========================================================================
+   Claims Dashboard Page Styling - Pixel-Perfect Drupal Authentic Replica
+   ========================================================================== */
+
+/* Left Main Content */
+.claims-page__title {
+  font-family: var(--font-family--headers, "SansaPro", sans-serif);
+  font-size: 2.875rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--primary-color, #003147);
+  margin: 0 0 20px 0;
+  letter-spacing: normal;
+}
+
+@media (max-width: 1099px) {
+  .claims-page__title {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 749px) {
+  .claims-page__title {
+    font-size: 2rem;
+  }
+}
+
+.claims-page__btn-start {
+  display: inline-block;
+  background: var(--secondary-color, #1cbc66) !important;
+  color: #003147 !important;
+  font-family: var(--font-family--headers, "SansaPro", sans-serif);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.1;
+  padding: 13px 20px !important;
+  border-radius: var(--border-radius, 5px) !important;
+  border: none !important;
+  cursor: pointer;
+  margin: 5px 0 25px 0;
+  min-height: 44px;
+  text-decoration: none;
+  box-shadow: none !important;
+  transition: all 0.15s ease;
+}
+
+.claims-page__btn-start:hover {
+  background: #1cbc66 !important;
+  color: #ffffff !important;
+}
+
+/* Claims Table Wrapper & Table */
+.claims-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  margin: 15px 0 35px;
+}
+
+.claims-table {
+  width: 100%;
+  border: 2px solid #c2dbe9 !important;
+  border-collapse: collapse !important;
+  font-size: 0.875rem !important;
+  line-height: 17px !important;
+  background-color: #ffffff;
+  color: #003147;
+}
+
+.claims-table th {
+  border-bottom: 1px solid #c2dbe9 !important;
+  border-right: 1px solid #c2dbe9 !important;
+  padding: 10px 15px !important;
+  text-align: left !important;
+  vertical-align: middle !important;
+  font-weight: 500 !important;
+  color: var(--primary-color, #003147) !important;
+  white-space: nowrap;
+  background: #ffffff;
+}
+
+.claims-table th:last-child {
+  border-right: none !important;
+}
+
+.claims-table td {
+  border-bottom: 1px solid #c2dbe9 !important;
+  border-right: 1px solid #c2dbe9 !important;
+  padding: 10px 15px !important;
+  text-align: left !important;
+  vertical-align: middle !important;
+  color: var(--primary-color, #003147) !important;
+  font-size: 0.875rem !important;
+  line-height: 17px !important;
+}
+
+.claims-table td:last-child {
+  border-right: none !important;
+}
+
+.claims-table__empty {
+  padding: 12px 15px !important;
+  color: #003147 !important;
+  font-size: 0.875rem !important;
+}
+
+/* Success Confirmation Banner */
+.claims-success-banner {
+  background-color: #eaf8f0;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--border-radius, 5px);
+  padding: 12px 18px;
+  margin-bottom: 22px;
+  color: #15803d;
+  font-size: 0.92rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  animation: bannerFadeIn 0.3s ease;
+}
+
+@keyframes bannerFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.claims-success-banner__content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.claims-success-banner__icon {
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.claims-success-banner__close {
+  background: none;
+  border: none;
+  color: #15803d;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+/* Graceful Claim Status Badges */
+.claim-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.claim-status-badge::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.claim-status--registered {
+  background-color: #eaf8f0;
+  color: #15803d;
+}
+
+.claim-status--registered::before {
+  background-color: #16a34a;
+}
+
+.claim-status--pending {
+  background-color: #eff6ff;
+  color: #1d4ed8;
+}
+
+.claim-status--pending::before {
+  background-color: #2563eb;
+}
+
+
+/* Right Sidebar */
+.claims-sidebar-card {
+  background-color: #e3f5ff;
+  border-radius: var(--border-radius, 5px);
+  padding: 20px 20px 25px;
+  box-sizing: border-box;
+}
+
+.claims-sidebar__user-email {
+  font-family: var(--font-family--headers, "SansaPro", sans-serif);
+  font-weight: 700;
+  color: var(--primary-color, #003147);
+  font-size: 0.9375rem;
+  margin: 0 0 16px 0;
+  word-break: break-all;
+  line-height: 1.35;
+}
+
+.claims-sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.claims-sidebar__link {
+  display: block;
+  background-color: #ffffff;
+  color: var(--primary-color, #003147);
+  padding: 10px 15px;
+  border-radius: var(--border-radius, 5px);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+}
+
+.claims-sidebar__link:hover {
+  color: var(--tertiary-color, #257aa7);
+}
+
+.claims-sidebar__link--active,
+.claims-sidebar__link--active:hover {
+  background-color: #216991 !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+.claims-sidebar__section-title {
+  font-family: var(--font-family--headers, "SansaPro", sans-serif);
+  color: var(--primary-color, #003147);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  margin: 24px 0 12px 0;
+}
+
+.claims-sidebar__integrations {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.claims-sidebar__integration-item {
+  display: block;
+  background-color: #ffffff;
+  color: var(--primary-color, #003147);
+  padding: 10px 15px;
+  border-radius: var(--border-radius, 5px);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.claims-sidebar__integration-item:hover {
+  color: var(--tertiary-color, #257aa7);
+}
+
+/* Floating Bottom-Right "u" Action Badge */
+.floating-unpaid-badge {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  background-color: #1cbc66;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(28, 188, 102, 0.4);
+  cursor: pointer;
+  z-index: 1000;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.floating-unpaid-badge:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 16px rgba(28, 188, 102, 0.55);
+}
+
+.floating-unpaid-badge__letter {
+  color: #ffffff;
+  font-family: 'SansaPro', sans-serif;
+  font-size: 1.55rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-top: -3px;
+}
+
+/* Hide Calendly Badge Widget on Claims Page */
+.calendly-badge-widget,
+.calendly-overlay {
+  display: none !important;
+}
+

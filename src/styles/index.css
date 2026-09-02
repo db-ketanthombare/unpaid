@@ -257,6 +257,365 @@
   background: rgba(239, 68, 68, 0.12);
 }
 
+/* Primary Scan Invoice CTA Button */
+.variant-c-scan-cta {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-color: #1cbc66 !important;
+  color: #ffffff !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+  padding: 10px 22px !important;
+  border-radius: 6px !important;
+  border: 1px solid #16a355 !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 14px rgba(28, 188, 102, 0.45) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  text-decoration: none !important;
+  margin-right: 8px;
+  line-height: 1.2 !important;
+}
+
+.variant-c-scan-cta:hover {
+  background-color: #16a355 !important;
+  box-shadow: 0 6px 18px rgba(28, 188, 102, 0.6) !important;
+  transform: translateY(-1px);
+  color: #ffffff !important;
+}
+
+.variant-c-scan-cta:active {
+  background-color: #15803d !important;
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(28, 188, 102, 0.4) !important;
+}
+
+/* ==========================================================================
+   Variant D: Minimal Toast Style Success State
+   ========================================================================== */
+
+.variant-d-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.variant-d-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(0, 24, 38, 0.88);
+  border: 1px solid rgba(28, 188, 102, 0.45);
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+}
+
+@media (max-width: 768px) {
+  .variant-d-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px;
+  }
+}
+
+.variant-d-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.variant-d-content {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.variant-d-title {
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 3px;
+  letter-spacing: -0.01em;
+}
+
+.variant-d-subtitle {
+  color: #94a3b8;
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.variant-d-subtitle strong {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.variant-d-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .variant-d-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+.variant-d-btn-review {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #1cbc66;
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 9px 20px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(28, 188, 102, 0.4);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.variant-d-btn-review:hover {
+  background-color: #16a355;
+  box-shadow: 0 6px 16px rgba(28, 188, 102, 0.6);
+  transform: translateY(-1px);
+}
+
+.variant-d-btn-review:active {
+  background-color: #15803d;
+  transform: translateY(0);
+}
+
+.variant-d-btn-scan {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: transparent;
+  color: #e2e8f0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.variant-d-btn-scan:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.variant-d-security-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 0.82rem;
+  color: #94a3b8;
+  padding-left: 4px;
+  text-align: left;
+}
+
+.variant-d-security-note span {
+  color: #94a3b8;
+}
+
+/* ==========================================================================
+   Processing State: Variant C (Progress Bar) - Compact & Aligned
+   ========================================================================== */
+
+.processing-variant-c {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.14);
+  padding: 16px 20px;
+  width: 100%;
+  animation: fadeIn 0.25s ease-out;
+  box-sizing: border-box;
+}
+
+.processing-variant-c__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.processing-variant-c__icon-wrapper {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #1cbc66;
+}
+
+.processing-variant-c__title-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+}
+
+/* Force dark color over Drupal's .hero-vat__wrapper h3 { color: white } */
+.hero-vat__wrapper .processing-variant-c__title,
+.hero-vat__form .processing-variant-c__title,
+.processing-variant-c__title {
+  color: #003147 !important;
+  font-size: 1.05rem !important;
+  font-weight: 700 !important;
+  margin: 0 0 2px 0 !important;
+  line-height: 1.25 !important;
+  display: block !important;
+}
+
+.hero-vat__wrapper .processing-variant-c__subtitle,
+.hero-vat__form .processing-variant-c__subtitle,
+.processing-variant-c__subtitle {
+  color: #64748b !important;
+  font-size: 0.83rem !important;
+  margin: 0 !important;
+  line-height: 1.25 !important;
+}
+
+.processing-variant-c__progress-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.processing-variant-c__track {
+  flex: 1;
+  height: 7px;
+  background-color: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.processing-variant-c__bar {
+  height: 100%;
+  background-color: #1cbc66;
+  border-radius: 999px;
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 6px rgba(28, 188, 102, 0.35);
+}
+
+.processing-variant-c__percentage {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #1e293b;
+  min-width: 38px;
+  text-align: right;
+  line-height: 1;
+}
+
+.processing-variant-c__footer {
+  display: flex;
+  justify-content: center;
+}
+
+.processing-variant-c__status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-size: 0.8rem;
+  color: #475569;
+}
+
+.processing-variant-c__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #1cbc66;
+  box-shadow: 0 0 0 0 rgba(28, 188, 102, 0.7);
+  animation: pulse-dot 1.6s infinite cubic-bezier(0.66, 0, 0, 1);
+}
+
+@keyframes pulse-dot {
+  to {
+    box-shadow: 0 0 0 5px rgba(28, 188, 102, 0);
+  }
+}
+
+/* Claim Success Modal */
+.claim-success-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 24, 38, 0.82);
+  backdrop-filter: blur(6px);
+  z-index: 100001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: authFadeIn 0.2s ease-out;
+}
+
+.claim-success-modal {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 36px 32px;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+  animation: authScaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.claim-success-modal__icon {
+  margin-bottom: 16px;
+}
+
+.claim-success-modal__title {
+  color: #003147;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0 0 10px;
+}
+
+.claim-success-modal__desc {
+  color: #475569;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0 0 24px;
+}
+
+.claim-success-modal__actions {
+  display: flex;
+  justify-content: center;
+}
+
+
+
 /* Camera Modal */
 .camera-modal-overlay {
   position: fixed;
@@ -391,4 +750,181 @@
   from { opacity: 0; transform: scale(0.98); }
   to { opacity: 1; transform: scale(1); }
 }
+
+/* ==========================================================================
+   Auth & Dashboard Header Styling (Specifically for login/signup & claims pages)
+   ========================================================================== */
+.main-header.header--auth {
+  background-color: #eaf8f0 !important;
+  background: #eaf8f0 !important;
+  border-bottom: 1px solid rgba(0, 49, 71, 0.08);
+}
+
+.main-header.header--auth .account-menu ul.menu li a,
+.main-header.header--auth .account-menu ul.menu a,
+.main-header.header--auth .account-menu a,
+.main-header.header--auth .account-menu__claims-btn,
+.main-header.header--auth .account-menu__logout-btn {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  color: #003147 !important;
+  font-weight: 600 !important;
+  padding: 8px 18px !important;
+  border-radius: 6px !important;
+  display: inline-block !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+  transition: all 0.15s ease !important;
+  line-height: normal !important;
+  text-decoration: none !important;
+}
+
+.main-header.header--auth .account-menu ul.menu li a:hover,
+.main-header.header--auth .account-menu ul.menu a:hover,
+.main-header.header--auth .account-menu a:hover,
+.main-header.header--auth .account-menu__claims-btn:hover,
+.main-header.header--auth .account-menu__logout-btn:hover {
+  background-color: #ffffff !important;
+  color: #257aa7 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
+}
+
+.main-header.header--auth .main-menu ul.menu li a:hover,
+.main-header:not(.header--auth) .main-menu ul.menu li a:hover,
+.main-header .main-menu ul.menu li a:hover {
+  color: #257aa7 !important;
+}
+
+/* ==========================================================================
+   Landing Page (Home) Header Styling - Pixel-Perfect Clone
+   ========================================================================== */
+.main-header:not(.header--auth) {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+}
+
+.main-header:not(.header--auth) .account-menu .account-claims-link,
+.main-header:not(.header--auth) .account-menu .account-logout-btn,
+.main-header:not(.header--auth) .account-menu ul.menu li a {
+  background-color: #eaf8f0 !important;
+  background: #eaf8f0 !important;
+  color: #003147 !important;
+  font-family: 'SansaPro', sans-serif !important;
+  font-weight: 600 !important;
+  padding: 8px 16px !important;
+  border-radius: 5px !important;
+  border: none !important;
+  display: inline-block !important;
+  text-decoration: none !important;
+  font-size: 0.95rem !important;
+  line-height: normal !important;
+  cursor: pointer !important;
+  margin: 0 3px !important;
+  box-shadow: none !important;
+  transition: all 0.15s ease !important;
+}
+
+.main-header:not(.header--auth) .account-menu .account-claims-link:hover,
+.main-header:not(.header--auth) .account-menu .account-logout-btn:hover,
+.main-header:not(.header--auth) .account-menu ul.menu li a:hover,
+.main-header .account-menu .account-claims-link:hover,
+.main-header .account-menu .account-logout-btn:hover {
+  background-color: #eaf8f0 !important;
+  color: #257aa7 !important;
+}
+
+.main-header .language-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+  margin: 0 0 0 15px;
+  padding: 0;
+}
+
+.main-header .language-switcher li {
+  display: inline-block;
+  text-transform: uppercase;
+  font-family: 'SansaPro', sans-serif;
+  font-size: 0.92rem;
+  color: #003147;
+}
+
+.main-header .language-switcher li.active {
+  font-weight: 700 !important;
+  color: #003147 !important;
+}
+
+.main-header .language-switcher li a {
+  color: #003147 !important;
+  text-decoration: none !important;
+  font-weight: 400 !important;
+  transition: color 0.15s ease;
+}
+
+.main-header .language-switcher li a:hover {
+  color: #257aa7 !important;
+}
+
+/* Ensure all main-menu items (including first-child 'For whom?') are always visible */
+.main-menu ul.menu li:first-child,
+.main-menu ul.menu li {
+  display: block;
+}
+
+@media (min-width: 1150px) {
+  .main-menu ul.menu li:first-child,
+  .main-menu ul.menu li {
+    display: inline-block !important;
+  }
+}
+
+
+
+/* Login Form & Registration Form Padding */
+.login-register__wrapper form.user-login-form,
+.login-register__wrapper .user-login-form,
+form.user-login-form {
+  background-color: var(--light-blue, #e9f7fb) !important;
+  border-radius: var(--border-radius, 5px) !important;
+  padding: 15px 25px !important;
+  box-sizing: border-box !important;
+}
+
+.login-register__wrapper form.user-login-form .form-item:first-child,
+.login-register__wrapper form.user-login-form .form-item:first-of-type {
+  margin-top: 0 !important;
+}
+
+/* Hero Video Shimmer Loading Effect */
+.hero__video-shimmer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    110deg,
+    #dbeafe 8%,
+    #eff6ff 18%,
+    #cbd5e1 33%,
+    #eff6ff 48%,
+    #dbeafe 68%
+  );
+  background-size: 300% 100%;
+  animation: heroVideoShimmer 1.6s infinite ease-in-out;
+  z-index: 2;
+  pointer-events: none;
+}
+
+@keyframes heroVideoShimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+
+
 

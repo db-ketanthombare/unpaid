@@ -1,0 +1,322 @@
+/* ==========================================================================
+   Extracted Invoice Review Component Styles (Pixel-accurate to Collectent AI)
+   ========================================================================== */
+
+.invoice-review {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+  font-family: var(--font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  color: #1e293b;
+}
+
+.invoice-review__banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 0.875rem 1.25rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.invoice-review__banner-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.invoice-review__success-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #1cbc66;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+}
+
+.invoice-review__banner-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #166534;
+}
+
+.invoice-review__file-tag {
+  font-size: 0.85rem;
+  color: #475569;
+  background: #ffffff;
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+}
+
+.invoice-review__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 900px) {
+  .invoice-review__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.invoice-review__card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  padding: 1.75rem 1.75rem 2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.invoice-review__card-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #003147;
+  margin: 0 0 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.invoice-review__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.invoice-review__field {
+  display: flex;
+  flex-direction: column;
+}
+
+.invoice-review__field-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.35rem;
+}
+
+.invoice-review__label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.invoice-review__required {
+  color: #ef4444;
+  margin-left: 0.2rem;
+  font-weight: 700;
+}
+
+.invoice-review__ai-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #ea580c;
+  background: #fff7ed;
+  border: 1px solid #ffedd5;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+}
+
+.invoice-review__input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.invoice-review__input,
+.invoice-review__select {
+  width: 100%;
+  height: 44px;
+  padding: 0 0.875rem;
+  font-size: 0.95rem;
+  color: #1e293b;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.invoice-review__input:focus,
+.invoice-review__select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* Warning highlight state (matching screenshot amber style) */
+.invoice-review__input--warning,
+.invoice-review__input-wrapper.has-warning .invoice-review__input {
+  background-color: #fffbeb !important;
+  border-color: #fde68a !important;
+  color: #92400e;
+  padding-right: 2.75rem;
+}
+
+.invoice-review__input--warning:focus {
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2) !important;
+}
+
+.invoice-review__warning-icon {
+  position: absolute;
+  right: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #d97706;
+  pointer-events: none;
+}
+
+.invoice-review__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.invoice-review__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.invoice-review__btn--secondary {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.invoice-review__btn--secondary:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.invoice-review__btn--primary {
+  background: #1cbc66;
+  color: #ffffff;
+  box-shadow: 0 2px 4px rgba(28, 188, 102, 0.25);
+}
+
+.invoice-review__btn--primary:hover {
+  background: #16a355;
+  box-shadow: 0 4px 8px rgba(28, 188, 102, 0.35);
+}
+
+/* Scanning Overlay Styles */
+.scanning-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  text-align: center;
+  max-width: 600px;
+  margin: 2rem auto;
+}
+
+.scanning-radar {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  margin-bottom: 1.5rem;
+}
+
+.scanning-radar__circle {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid #1cbc66;
+  opacity: 0.3;
+}
+
+.scanning-radar__pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(28, 188, 102, 0.15);
+  animation: radar-pulse 2s infinite ease-out;
+}
+
+.scanning-radar__icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1cbc66;
+}
+
+@keyframes radar-pulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+.scanning-overlay__title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #003147;
+  margin: 0 0 0.5rem;
+}
+
+.scanning-overlay__desc {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin: 0 0 1.25rem;
+  max-width: 440px;
+}
+
+.scanning-overlay__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.85rem;
+  color: #475569;
+}
