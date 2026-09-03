@@ -411,10 +411,13 @@ export function HomePage() {
   };
 
   const handleConfirmClaim = async (data: ExtractedInvoiceData) => {
+    setIsSubmittingClaim(true);
     if (!isAuthenticated) {
       // User is not logged in: save pending claim and redirect directly to dedicated login page
       sessionStorage.setItem('unpaid_pending_claim', JSON.stringify(data));
-      navigate('/en/user/login?destination=/claims');
+      setTimeout(() => {
+        navigate('/en/user/login?destination=/claims');
+      }, 600);
       return;
     }
 
@@ -842,9 +845,26 @@ export function HomePage() {
         {extractedData && (
           <div ref={reviewRef} style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', padding: '2.5rem 0' }}>
             {isSubmittingClaim && (
-              <div style={{ maxWidth: '1200px', margin: '0 auto 1.5rem', padding: '12px 18px', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '8px', color: '#1e40af', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span className="processing-variant-c__dot" style={{ backgroundColor: '#2563eb' }}></span>
-                <span>Submitting your invoice claim to the legal bailiff network...</span>
+              <div style={{ maxWidth: '1200px', margin: '0 auto 1.5rem', padding: '14px 20px', background: '#eaf8f0', border: '1px solid #bbf7d0', borderRadius: '8px', color: '#065f46', fontSize: '0.95rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#1cbc66"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ animation: 'spin 1s linear infinite', flexShrink: 0 }}
+                >
+                  <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                  <path d="M12 2a10 10 0 0 1 10 10" />
+                </svg>
+                <span>
+                  {isAuthenticated
+                    ? 'Saving your claim & redirecting to your claims dashboard...'
+                    : 'Details saved. Redirecting you to log in & complete your claim submission...'}
+                </span>
               </div>
             )}
             {claimError && (
@@ -858,6 +878,7 @@ export function HomePage() {
               fileName={invoiceFile?.name}
               onReset={handleResetScan}
               onConfirm={handleConfirmClaim}
+              isRedirecting={isSubmittingClaim}
             />
           </div>
         )}
