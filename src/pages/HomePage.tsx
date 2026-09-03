@@ -233,10 +233,29 @@ export function HomePage() {
     }, 4800);
 
     try {
-      const data = await invoiceService.scanInvoice(invoiceFile.rawFile, invoiceFile.name);
+      const data = await invoiceService.scanInvoice(invoiceFile.rawFile, invoiceFile.name, token || undefined);
+
+      // Check if invoice already exists locally if backend did not already flag it
+      let isDup = Boolean(data.isDuplicate);
+      const invNum = data.invoiceDetails?.invoiceNumber?.trim();
+      if (!isDup && invNum) {
+        try {
+          const storedClaims = JSON.parse(localStorage.getItem('unpaid_user_claims') || '[]');
+          const match = storedClaims.find((c: { claimNumber?: string }) => c.claimNumber?.toLowerCase() === invNum.toLowerCase());
+          if (match) {
+            isDup = true;
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
       setScanProgress(100);
       setScanStatus('Scan complete!');
-      setExtractedData(data);
+      setExtractedData({
+        ...data,
+        isDuplicate: isDup,
+      });
       setTimeout(() => {
         reviewRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 150);

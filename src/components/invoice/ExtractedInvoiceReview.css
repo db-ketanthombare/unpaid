@@ -188,6 +188,15 @@
   pointer-events: none;
 }
 
+.invoice-review__warning-text {
+  margin: 0.35rem 0 0 0;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #b45309;
+  display: flex;
+  align-items: center;
+}
+
 .invoice-review__actions {
   display: flex;
   align-items: center;

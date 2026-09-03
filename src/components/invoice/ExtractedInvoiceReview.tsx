@@ -102,18 +102,36 @@ export function ExtractedInvoiceReview({
   return (
     <div className="invoice-review">
       {/* Top Banner */}
-      <div className="invoice-review__banner">
-        <div className="invoice-review__banner-left">
-          <span className="invoice-review__banner-title">
-            Invoice details successfully recognized by Collectent OCR
-          </span>
-        </div>
-        {fileName && (
-          <div className="invoice-review__file-tag">
-            📄 <strong>{fileName}</strong>
+      {data.isDuplicate ? (
+        <div className="invoice-review__banner invoice-review__banner--duplicate" style={{ background: '#fef2f2', borderColor: '#fecaca' }}>
+          <div className="invoice-review__banner-left">
+            <span className="invoice-review__duplicate-badge" style={{ background: '#ef4444', color: '#fff', fontSize: '0.75rem', fontWeight: 700, padding: '0.25rem 0.6rem', borderRadius: '4px' }}>
+              DUPLICATE INVOICE DETECTED
+            </span>
+            <span className="invoice-review__banner-title" style={{ color: '#991b1b' }}>
+              An invoice with number <strong>{invoice.invoiceNumber || 'this number'}</strong> has already been registered in your account.
+            </span>
           </div>
-        )}
-      </div>
+          {fileName && (
+            <div className="invoice-review__file-tag">
+              📄 <strong>{fileName}</strong>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="invoice-review__banner">
+          <div className="invoice-review__banner-left">
+            <span className="invoice-review__banner-title">
+              Invoice details successfully recognized by Collectent OCR
+            </span>
+          </div>
+          {fileName && (
+            <div className="invoice-review__file-tag">
+              📄 <strong>{fileName}</strong>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Main Two-Column Layout */}
       <div className="invoice-review__grid">
@@ -173,6 +191,14 @@ export function ExtractedInvoiceReview({
                 />
                 <WarningIcon />
               </div>
+              <p className="invoice-review__warning-text">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: '-1px', marginRight: '4px' }}>
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                Needs human review to confirm accuracy
+              </p>
             </div>
 
             {/* Address */}
@@ -270,6 +296,14 @@ export function ExtractedInvoiceReview({
                 />
                 <WarningIcon />
               </div>
+              <p className="invoice-review__warning-text">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: '-1px', marginRight: '4px' }}>
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                Needs human review to confirm accuracy
+              </p>
             </div>
           </div>
         </div>
@@ -302,15 +336,26 @@ export function ExtractedInvoiceReview({
                   Invoice Number <span className="invoice-review__required">*</span>
                 </label>
               </div>
-              <div className="invoice-review__input-wrapper">
+              <div className={`invoice-review__input-wrapper ${data.isDuplicate ? 'has-warning' : ''}`}>
                 <input
                   type="text"
-                  className="invoice-review__input"
+                  className={`invoice-review__input ${data.isDuplicate ? 'invoice-review__input--warning' : ''}`}
                   value={invoice.invoiceNumber || ''}
                   onChange={(e) => handleInvoiceChange('invoiceNumber', e.target.value)}
                   placeholder="e.g. INV-2024-0097"
                 />
+                {data.isDuplicate && <WarningIcon />}
               </div>
+              {data.isDuplicate && (
+                <p className="invoice-review__warning-text" style={{ color: '#dc2626' }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: '-1px', marginRight: '4px' }}>
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                  Warning: Invoice number already exists in your claims history
+                </p>
+              )}
             </div>
 
             {/* Invoice Date */}
@@ -432,6 +477,14 @@ export function ExtractedInvoiceReview({
                 />
                 <WarningIcon />
               </div>
+              <p className="invoice-review__warning-text">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: '-1px', marginRight: '4px' }}>
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                Needs human review to confirm accuracy
+              </p>
             </div>
           </div>
         </div>

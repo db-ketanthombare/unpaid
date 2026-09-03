@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
+import { ScrollToTop } from '@/components/common/ScrollToTop'
 import { HomePage } from '@/pages/HomePage'
 import { LoginPage } from '@/pages/LoginPage'
 import { ClaimsPage } from '@/pages/ClaimsPage'
@@ -8,7 +9,9 @@ import { NotFoundPage } from '@/pages/NotFoundPage'
 
 export function AppRouter() {
   return (
-    <Routes>
+    <>
+      <ScrollToTop />
+      <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/en" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
@@ -26,5 +29,6 @@ export function AppRouter() {
       <Route path="/en/user/account" element={<AccountPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
+    </>
   )
 }

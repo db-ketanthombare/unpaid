@@ -11,6 +11,8 @@ export class InvoiceService {
   }
 
   private getAuthToken(): string {
+    const userToken = localStorage.getItem('unpaid_auth_token');
+    if (userToken && userToken.trim() !== '') return userToken.trim();
     const envToken = import.meta.env.VITE_API_AUTH_TOKEN;
     return envToken && envToken.trim() !== '' ? envToken.trim() : DEFAULT_AUTH_TOKEN;
   }
@@ -18,9 +20,9 @@ export class InvoiceService {
   /**
    * Sends a PDF or image invoice to Collectent AI for Gemini Multimodal OCR extraction.
    */
-  async scanInvoice(file: File | Blob, fileName?: string): Promise<ExtractedInvoiceData> {
+  async scanInvoice(file: File | Blob, fileName?: string, customToken?: string): Promise<ExtractedInvoiceData> {
     const baseUrl = this.getBaseUrl();
-    const token = this.getAuthToken();
+    const token = customToken || this.getAuthToken();
     const url = `${baseUrl}/invoices/scan`;
 
     const formData = new FormData();

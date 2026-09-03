@@ -12,9 +12,28 @@ export function LoginPage() {
   const [searchParams] = useSearchParams();
 
   React.useEffect(() => {
+    window.scrollTo(0, 0);
+
     if (isAuthenticated) {
       const redirectUrl = searchParams.get('destination') || '/claims';
       navigate(redirectUrl);
+      return;
+    }
+
+    // If there is a pending claim, auto-fill registration fields with creditor info
+    const rawPending = sessionStorage.getItem('unpaid_pending_claim');
+    if (rawPending) {
+      try {
+        const pendingData: ExtractedInvoiceData = JSON.parse(rawPending);
+        if (pendingData.creditorDetails?.companyName) {
+          setRegCompany(pendingData.creditorDetails.companyName);
+        }
+        if (pendingData.creditorDetails?.email) {
+          setRegEmail(pendingData.creditorDetails.email);
+        }
+      } catch (e) {
+        console.error(e);
+      }
     }
   }, [isAuthenticated, navigate, searchParams]);
 
@@ -282,22 +301,42 @@ export function LoginPage() {
               {sessionStorage.getItem('unpaid_pending_claim') && (
                 <div
                   style={{
-                    background: '#eaf8f0',
-                    border: '1px solid #bbf7d0',
-                    borderRadius: '5px',
-                    padding: '12px 18px',
-                    marginBottom: '24px',
-                    color: '#15803d',
-                    fontSize: '0.92rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
+                    background: '#f0fdf4',
+                    border: '1.5px solid #86efac',
+                    borderRadius: '8px',
+                    padding: '16px 20px',
+                    marginBottom: '28px',
+                    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.04)',
                   }}
                 >
-                  <span>✓</span>
-                  <span>
-                    <strong>Invoice claim ready:</strong> Please log in or register below to finalize and initiate your collection claim.
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                    <div
+                      style={{
+                        background: '#1cbc66',
+                        color: '#ffffff',
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: 'bold',
+                        fontSize: '15px',
+                        flexShrink: 0,
+                        marginTop: '2px',
+                      }}
+                    >
+                      ✓
+                    </div>
+                    <div>
+                      <h3 style={{ margin: '0 0 4px 0', fontSize: '1.05rem', fontWeight: 700, color: '#166534' }}>
+                        Your Invoice Details Are Saved!
+                      </h3>
+                      <p style={{ margin: 0, fontSize: '0.92rem', color: '#15803d', lineHeight: '1.45' }}>
+                        To officially submit this claim to the legal bailiff network and track its recovery in your dashboard, please <strong>log in</strong> with your existing account or <strong>create a free account</strong> below. Your invoice will automatically link to your new account.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
 
