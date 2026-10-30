@@ -1,6 +1,6 @@
 import { ExtractedInvoiceData, ScanInvoiceApiResponse } from '@/types/invoice';
 
-const DEFAULT_API_BASE_URL = 'https://collectent-ai-backend.onrender.com/api';
+const DEFAULT_API_BASE_URL = 'https://api.collectent.ai/api';
 const DEFAULT_AUTH_TOKEN =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhN2MyMjlmYjE2YWQxYjNjYjRjYzFiYyIsImlhdCI6MTc4ODM2NjMxOCwiZXhwIjoxODE5OTAyMzE4fQ.MakmuL1SGykRRfFH5VWVAsL2q8L-czRyByE_sxNKs4g';
 

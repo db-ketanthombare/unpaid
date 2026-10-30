@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 
@@ -26,9 +26,21 @@ export default defineConfig({
   server: {
     port: 3000,
     open: false,
+    proxy: {
+      '/api': {
+        target: 'https://api.collectent.ai',
+        changeOrigin: true,
+        secure: true,
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            proxyReq.removeHeader('origin');
+          });
+        },
+      },
+    },
     watch: {
-      ignored: ['**/scratch/**', '**/.git/**']
-    }
+      ignored: ['**/scratch/**', '**/.git/**'],
+    },
   },
   build: {
     outDir: 'dist',

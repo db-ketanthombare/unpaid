@@ -1,7 +1,7 @@
 import { LoginCredentials, RegisterCredentials, AuthApiResponse, User } from '@/types/auth';
 import { ExtractedInvoiceData } from '@/types/invoice';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://collectent-ai-backend.onrender.com/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.collectent.ai/api';
 const TOKEN_KEY = 'unpaid_auth_token';
 const USER_KEY = 'unpaid_user';
 
